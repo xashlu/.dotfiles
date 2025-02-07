@@ -1,0 +1,6 @@
+alias g='git'
+alias gs='git status'
+alias gr='git remote -v'
+alias gb='git branch'
+alias gc='git clone'
+alias gcm='git commit -m'
