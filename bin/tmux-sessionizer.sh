@@ -30,8 +30,8 @@ done < "$allowed_dirs_file"
 
 # Define tag mappings (mapping session names to dwm tags)
 declare -A tag_mapping=(
-    ["XASHLU"]=1
-    ["DOCUMENTATIONS"]=2
+    ["DIR_NAME_1"]=1
+    ["DIR_NAME_2"]=2
 )
 
 # Function to check if a directory should be skipped
