@@ -1,0 +1,20 @@
+Next
+    xdotool search --class "vlc" key space
+
+Home
+    $HOME/.local/bin/manage-vlc-volume.sh
+
+Insert
+    xdotool search --class "vlc" key Down
+
+End
+    xdotool search --class "vlc" key n
+
+Delete
+    xdotool search --class "vlc" key p
+
+alt + o
+    wezterm
+
+alt + l
+    /usr/bin/brave 
