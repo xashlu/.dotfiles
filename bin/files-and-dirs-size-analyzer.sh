@@ -1,40 +1,40 @@
 #!/bin/bash
-
-# Function to display usage instructions
 usage() {
-    echo "Usage: $0 [-s size_in_mb] [-d directory] [-f] [-D] [-S] [input_file] [output_directory]"
+    echo "Usage: $0 [-s size_in_mb] [-d directory] [-f] [-D] [-S] [-t order] [input_file] [output_directory]"
     echo "  -s size_in_mb : Maximum file size in megabytes to include (default: no limit)"
     echo "  -d directory  : Directory to search (default: current directory)"
     echo "  -f            : Count all files (current dir + subdirs)"
     echo "  -D            : Count all directories (current dir + subdirs)"
     echo "  -S            : Split files into zero-byte and non-zero-byte categories"
+    echo "  -t order      : Sort by size (ascending or descending) (default: descending)"
     echo "  input_file    : (Optional) File containing null-delimited file paths"
     echo "  output_directory : (Optional) Directory to save output files (default: script-name-output)"
     exit 1
 }
 
-# Check if no arguments are provided
+
 if [ $# -eq 0 ]; then
     usage
 fi
 
-# Default values
+
 directory="."
 input_file=""
 min_size=0
 count_files=0
 count_dirs=0
 split_mode=0
+sort_order="desc"  
 
-# Extract the script name without extension
+
 script_name=$(basename "$0" .sh)
 output_directory="${script_name}-output"
 
-# Prepare directory
+
 mkdir -p "$output_directory"
 rm -rf "$output_directory"/*
 
-# Define an array of patterns to exclude
+
 EXCLUDES=(
   "*/.git/*"
   "*.py[cod]"
@@ -67,8 +67,8 @@ EXCLUDES=(
   "*/node_modules/*"
 )
 
-# Parse options
-while getopts ":s:d:fDS" opt; do
+
+while getopts ":s:d:fDSTt:" opt; do
     case "$opt" in
         s)
             min_size="$OPTARG"
@@ -85,6 +85,9 @@ while getopts ":s:d:fDS" opt; do
         S)
             split_mode=1
             ;;
+        t)
+            sort_order="$OPTARG"
+            ;;
         *)
             usage
             ;;
@@ -92,33 +95,33 @@ while getopts ":s:d:fDS" opt; do
 done
 shift $((OPTIND-1))
 
-# If an input file is provided as an argument
-if [ $# -ge 1 ]; then
+
+if [ $
     input_file="$1"
     shift
 fi
 
-# If no input file is provided, generate it
+
 if [ -z "$input_file" ]; then
     input_file="${output_directory}/file_list.txt"
     
-    # Construct the find command with exclusions
+    
     find_cmd=(find "$directory" -type f)
     
-    # Add exclusion patterns to the find command
+    
     for pattern in "${EXCLUDES[@]}"; do
         find_cmd+=(-not -path "$pattern")
     done
     
-    # Add size condition if defined
+    
     if [ "$min_size" -gt 0 ]; then
         find_cmd+=(-size -"$((min_size * 1024 * 1024))"c)
     fi
     
-    # Add the print0 to make the output null-delimited
+    
     find_cmd+=(-print0)
 
-    # Execute the constructed find command and redirect output to the input file
+    
     "${find_cmd[@]}" | sort -z > "$input_file"
 
     if [ $? -ne 0 ]; then
@@ -137,7 +140,19 @@ count_dirs_func() {
     echo "Total directories in '$directory': $count"
 }
 
-# Process the input file
+
+sort_files() {
+    if [ "$sort_order" == "asc" ]; then
+        sort_cmd="sort -n"
+    else
+        sort_cmd="sort -nr"
+    fi
+    
+    
+    xargs -0 du -b 2>/dev/null < "$input_file" | $sort_cmd
+}
+
+
 if [ "$split_mode" -eq 1 ]; then
     empty_output="${output_directory}/empty_files.txt"
     nonempty_output="${output_directory}/non_empty_files.txt"
@@ -167,7 +182,8 @@ if [ "$split_mode" -eq 1 ]; then
 else
     output_file="${output_directory}/output.txt"
     > "$output_file"
-    xargs -0 du -b 2>/dev/null < "$input_file" | while read -r size filepath; do
+    
+    sort_files | while read -r size filepath; do
          echo "$filepath $size" >> "$output_file"
     done
 
