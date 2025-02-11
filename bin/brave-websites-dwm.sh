@@ -79,23 +79,7 @@ else
     echo "Failed to find both Brave windows for dwm tag 9. Skipping move."
 fi
 
-# Launch VLC and move it to dwm tag 8
-vlc --loop --random $HOME/Desktop/OTHER/songs/ &
-sleep 2  # Wait for VLC to launch (adjust as needed)
+# Hide the vlc window from the X11 display
+vlc --random --loop $HOME/Desktop/OTHER/songs/ & sleep 1 && xdo hide -N "vlc"
 
-# Get the window ID of the VLC process
-vlc_window_id=$(xdotool search --onlyvisible --class "vlc" | head -n 1)
-
-# Ensure that the window ID is found before moving it
-if [ -n "$vlc_window_id" ]; then
-    echo "Moving VLC window $vlc_window_id to dwm tag 8..."
-    xdotool windowmap "$vlc_window_id"  # Ensure the window is mapped
-    xdotool windowactivate "$vlc_window_id"  # Activate the window before moving
-    sleep 0.1  # Wait just a bit after activation for consistency
-    xdotool windowfocus "$vlc_window_id"  # Focus the window again
-    xdotool key "Alt+Shift+8"  # Move window to dwm tag 8
-else
-    echo "Failed to find window ID for VLC. Skipping move."
-fi
-
-echo "All Brave windows launched and moved to their corresponding dwm tags, VLC moved to tag 8."
+echo "All Brave windows launched and moved to their corresponding dwm tags"
