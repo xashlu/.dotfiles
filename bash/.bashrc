@@ -1,14 +1,11 @@
-# If not an interactive shell, exit early
 [[ $- != *i* ]] && return
 
 CONFIG_DIR="$XDG_CONFIG_HOME/bash"
 
-# List of files to exclude from loading
 EXCLUDE_FILES=(
     "$CONFIG_DIR/aliases/docker.sh"
 )
 
-# Function to check if a file is in the exclusion list
 is_excluded() {
     local file="$1"
     for excluded in "${EXCLUDE_FILES[@]}"; do
@@ -17,27 +14,31 @@ is_excluded() {
     return 1
 }
 
-# Load functions and aliases (excluding specific files)
+SYMLINK_DIR="$HOME/.local/bin"
+SOURCE_DIR="$HOME/.my-scripts"
+
+for script in "$SOURCE_DIR"/*; do
+    ln -sf "$script" "$SYMLINK_DIR/$(basename "$script")"
+done
+
 for dir in "$CONFIG_DIR/aliases" "$CONFIG_DIR/functions"; do
-    [[ -d "$dir" ]] || continue  # Ensure the directory exists before looping
+    [[ -d "$dir" ]] || continue
     for file in "$dir"/*; do
-        [[ -f "$file" ]] || continue  # Skip non-files
+        [[ -f "$file" ]] || continue
         is_excluded "$file" || . "$file"
     done
 done
 
-# Aliases
 alias lda=load_docker_aliases
 alias c=execute_script
 alias Z=executable_details
+alias T=tree_find
 
-# Use vi-style keybindings in Bash
 set -o vi
 
-# Keybindings
 bind -x '"\C-p": fzf_select_file'
 bind -x '"\C-k": ls -Al'
 bind '"\C-o": "nvim .\C-m"'
-bind '"\C-n": "TK\C-m"'
+bind '"\C-n": "tk\C-m"'
 bind -x '"\C-l": clear_and_delete_history'
 bind -x '"\C-x": edit_current_command'
