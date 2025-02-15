@@ -42,3 +42,9 @@ bind '"\C-o": "nvim .\C-m"'
 bind '"\C-n": "tk\C-m"'
 bind -x '"\C-l": clear_and_delete_history'
 bind -x '"\C-x": edit_current_command'
+
+PS1="\[\033[38;5;39m\]\u\[$(tput sgr0)\]\[\033[38;5;45m\]@\[$(tput sgr0)\]\[\033[38;5;51m\]\h\[$(tput sgr0)\] "\
+"\[\033[38;5;190m\]➜\[$(tput sgr0)\] "\
+"\[\033[38;5;118m\]\w\[$(tput sgr0)\] "\
+"\[\033[38;5;214m\]\$(parse_git_branch)\[$(tput sgr0)\]\n"\
+"\[\033[48;5;236m\]\[\033[38;5;231m\]❯\[$(tput sgr0)\] \[\033[0m\]"
