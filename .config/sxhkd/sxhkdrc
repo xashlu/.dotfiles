@@ -1,5 +1,6 @@
 Next
-    xdotool search --class "vlc" key space
+    dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
+#xdotool search --class "vlc" key space
 
 Home
     $HOME/.local/bin/manage-vlc-volume.sh
@@ -8,13 +9,16 @@ Insert
     xdotool search --class "vlc" key Down
 
 End
-    xdotool search --class "vlc" key n
+    dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
+#xdotool search --class "vlc" key n
 
 Delete
-    xdotool search --class "vlc" key p
+    dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
+#xdotool search --class "vlc" key p
 
 alt + o
     wezterm
 
 alt + l
     /usr/bin/brave 
+
