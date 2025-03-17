@@ -12,6 +12,7 @@ local config = {
     key = '<F5>',
 }
 
+-- Function to transform and resolve the path
 local function transform_path(path)
     vim.notify("Input path: " .. path, vim.log.levels.INFO)
     local components = vim.split(path, '/', { plain = true })
@@ -76,8 +77,8 @@ local function transform_path(path)
     return final_path
 end
 
--- Function to open the file with the appropriate application
-local function open_file()
+-- Function to open the file or directory
+local function open_file_or_directory()
     local path = vim.fn.expand('<cfile>')
     if path == '' then
         vim.notify("No file path under cursor", vim.log.levels.INFO)
@@ -89,30 +90,38 @@ local function open_file()
         return
     end
 
-    -- Extract file extension (lowercase)
-    local ext = transformed:match('%.([^%.]+)$') or ''
-    ext = ext:lower()
+    -- Check if the path is a directory
+    if vim.fn.isdirectory(transformed) == 1 then
+        -- Open directory in WezTerm
+        vim.notify("Opening directory in WezTerm: " .. transformed, vim.log.levels.INFO)
+        vim.fn.jobstart({ 'wezterm', 'cli', 'spawn', '--cwd', transformed }, { detach = true })
+    else
+        -- Extract file extension (lowercase)
+        local ext = transformed:match('%.([^%.]+)$') or ''
+        ext = ext:lower()
 
-    -- Determine the application to use
-    local app = config.mappings[ext] or 'xdg-open' -- Fallback to system default
-    if not app then
-        vim.notify("No application mapped for extension: " .. ext, vim.log.levels.WARN)
-        return
+        -- Determine the application to use
+        local app = config.mappings[ext] or 'xdg-open' -- Fallback to system default
+        if not app then
+            vim.notify("No application mapped for extension: " .. ext, vim.log.levels.WARN)
+            return
+        end
+
+        -- Open the file
+        vim.notify("Opening file with: " .. app, vim.log.levels.INFO)
+        vim.fn.jobstart({ app, transformed }, { detach = true })
     end
-
-    -- Open the file
-    vim.fn.jobstart({ app, transformed }, { detach = true })
 end
 
 -- Module setup function
 local M = {}
 M.setup = function(opts)
     config = vim.tbl_extend('force', config, opts or {})
-    vim.keymap.set({'n', 'v'}, config.key, open_file)
+    vim.keymap.set({'n', 'v'}, config.key, open_file_or_directory)
 end
-M.open_file = open_file -- Expose for manual use
+M.open_file_or_directory = open_file_or_directory -- Expose for manual use
 
 -- Default keymap if not using setup
-vim.keymap.set({'n', 'v'}, config.key, open_file)
+vim.keymap.set({'n', 'v'}, config.key, open_file_or_directory)
 
 return M
