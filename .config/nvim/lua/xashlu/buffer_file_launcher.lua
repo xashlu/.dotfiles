@@ -1,13 +1,34 @@
 -- Default configuration
 local config = {
     mappings = {
+        -- Image formats
         ['jpg']  = 'nsxiv',
         ['jpeg'] = 'nsxiv',
         ['png']  = 'nsxiv',
+        ['gif']  = 'nsxiv',
+        ['webp'] = 'nsxiv',
+        -- Documents
         ['pdf']  = 'zathura',
+        ['md']   = 'glow',
+        -- Office formats
         ['doc']  = 'libreoffice',
         ['docx'] = 'libreoffice',
         ['odt']  = 'libreoffice',
+        ['xls']  = 'libreoffice',
+        ['xlsx'] = 'libreoffice',
+        ['ppt']  = 'libreoffice',
+        ['pptx'] = 'libreoffice',
+        -- Video formats
+        ['mp4']  = 'vlc',
+        ['mkv']  = 'vlc',
+        ['avi']  = 'vlc',
+        ['mov']  = 'vlc',
+        ['webm'] = 'vlc',
+        ['flv']  = 'vlc',
+        ['m4v']  = 'vlc',
+        ['mpg']  = 'vlc',
+        ['mpeg'] = 'vlc',
+        ['wmv']  = 'vlc'
     },
     key = '<F5>',
 }
