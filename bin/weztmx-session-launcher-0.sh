@@ -1,11 +1,16 @@
 #!/bin/bash
 
-# Generate unique socket for each wezterm instance
-tmux_socket="wezterm-$(wezterm cli get-pane-direction | md5sum | cut -d' ' -f1)"
+# Generate a unique socket for each wezterm instance using a random UUID
+tmux_socket="wezterm-$(uuidgen | md5sum | cut -d' ' -f1)"
 
 nvim_shada_dir="$HOME/.local/state/nvim/shada"
-paths_file="$HOME/Desktop/X/I/I/a.txt"
-variables_file="$HOME/Desktop/X/I/I/a.txt-variables"
+
+default_paths_file="$HOME/Desktop/X/I/I/a.txt"
+default_variables_file="$HOME/Desktop/X/I/I/a.txt-variables"
+
+# Accept paths file as an argument, fallback to default
+paths_file="${1:-$default_paths_file}"
+variables_file="$default_variables_file"
 
 rm -rf "$nvim_shada_dir"/* &>/dev/null
 
