@@ -1,7 +1,8 @@
 fzf_select_file() {
   while true; do
     local files
-    files=$(ls -aF | grep -v '^./$')
+    # Using find to ensure all files, including one-letter directories, are listed
+    files=$(find . -mindepth 1 -maxdepth 1 -printf '%P\n')
 
     local selection
     local key
