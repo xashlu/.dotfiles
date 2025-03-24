@@ -31,6 +31,7 @@ done
 
 alias lda=load_docker_aliases
 alias c=execute_script
+alias C='nvim ~/script'
 alias Z=executable_details
 alias T=tree_find
 
