@@ -3,7 +3,7 @@ Next
 #xdotool search --class "vlc" key space
 
 Home
-    $HOME/.local/bin/manage-vlc-volume.sh
+    $HOME/.local/bin/utilities/manage-vlc-volume
 
 Insert
     xdotool search --class "vlc" key Down
@@ -17,8 +17,9 @@ Delete
 #xdotool search --class "vlc" key p
 
 alt + o
-    wezterm
-
+    /usr/bin/wezterm
+    
+    
 alt + l
     /usr/bin/brave 
 

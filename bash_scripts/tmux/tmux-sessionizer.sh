@@ -9,11 +9,11 @@ rm -rf "$nvim_shada_dir"/*
 base_dir="$HOME/Desktop"
 
 # Path to allowed directories text file
-allowed_dirs_file="$HOME/.local/bin/allowed-dirs.txt"
+allowed_dirs_file="$HOME/.bash-scripts/personal/allowed-dirs.txt"
 
 # Initialize arrays
 skip_list=()
-dont_skip=()  
+dont_skip=()  # We'll populate this with directories in the allowed-dirs.txt
 
 # Check if the allowed-dirs.txt file exists
 if [[ ! -f "$allowed_dirs_file" ]]; then
@@ -30,8 +30,7 @@ done < "$allowed_dirs_file"
 
 # Define tag mappings (mapping session names to dwm tags)
 declare -A tag_mapping=(
-    ["DIR_NAME_1"]=1
-    ["DIR_NAME_2"]=2
+    ["X"]=1
 )
 
 # Function to check if a directory should be skipped
@@ -125,4 +124,3 @@ for session_name in "${!tag_mapping[@]}"; do
 done
 
 echo "All done!"
-
