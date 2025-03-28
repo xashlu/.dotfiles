@@ -168,7 +168,9 @@ else
 fi
 
 source_all_directories
-export D='Desktop'
+
+export D=$(echo "$HOME/Desktop")
+
 # Source the .bashrc file if it exists
 BASHRC_FILE="$XDG_CONFIG_HOME/bash/.bashrc"
 if [[ -f "$BASHRC_FILE" ]]; then
