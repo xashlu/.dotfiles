@@ -5,8 +5,8 @@ tmux_socket="wezterm-$(uuidgen | md5sum | cut -d' ' -f1)"
 
 nvim_shada_dir="$HOME/.local/state/nvim/shada"
 
-default_paths_file="$HOME/Desktop/X/I/I/a.txt"
-default_variables_file="$HOME/Desktop/X/I/I/a.txt-variables"
+default_paths_file="$HOME/Desktop/CP/init.txt"
+default_variables_file="$HOME/Desktop/CP/init-variables.txt"
 
 # Accept paths file as an argument, fallback to default
 paths_file="${1:-$default_paths_file}"

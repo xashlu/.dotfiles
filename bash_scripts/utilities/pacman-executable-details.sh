@@ -1,4 +1,6 @@
-function executable_details() {
+#!/bin/bash
+
+function pacman_executable_details() {
     local executable_path
     executable_path=$(which "$1" 2>/dev/null || command -v "$1" 2>/dev/null)
 
@@ -20,3 +22,11 @@ function executable_details() {
     fi
 }
 
+# Check if an argument is passed to the script
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <executable_name>"
+    exit 1
+fi
+
+# Call the function with the provided argument
+pacman_executable_details "$1"

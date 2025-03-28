@@ -1,3 +1,5 @@
+#!/bin/bash
+
 tmux_kill_session() {
   session_name=$(tmux ls | cut -d: -f1 | fzf --prompt="Select a tmux session to kill: ")
 
@@ -9,4 +11,6 @@ tmux_kill_session() {
 }
 
 tk() { tmux_kill_session; }
-export -f tk
+
+# Call the tk function to execute it
+tk
