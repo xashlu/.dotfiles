@@ -2,33 +2,35 @@
 local config = {
     mappings = {
         -- Image formats
-        ['jpg']  = 'nsxiv',
-        ['jpeg'] = 'nsxiv',
-        ['png']  = 'nsxiv',
-        ['gif']  = 'nsxiv',
-        ['webp'] = 'nsxiv',
+        ['jpg']  = os.getenv('IMAGE_VIEWER') or 'nsxiv',
+        ['jpeg'] = os.getenv('IMAGE_VIEWER') or 'nsxiv',
+        ['png']  = os.getenv('IMAGE_VIEWER') or 'nsxiv',
+        ['gif']  = os.getenv('IMAGE_VIEWER') or 'nsxiv',
+        ['webp'] = os.getenv('IMAGE_VIEWER') or 'nsxiv',
         -- Documents
-        ['pdf']  = 'zathura',
-        ['md']   = 'glow',
+        ['pdf']  = os.getenv('DOCUMENT_VIEWER') or 'zathura',
+        ['md']   = 'glow', -- No fallback needed, glow is specific
+        -- Use $EDITOR or fallback to xdg-open
+        ['txt']  = os.getenv('EDITOR') or 'xdg-open',
         -- Office formats
-        ['doc']  = 'libreoffice',
-        ['docx'] = 'libreoffice',
-        ['odt']  = 'libreoffice',
-        ['xls']  = 'libreoffice',
-        ['xlsx'] = 'libreoffice',
-        ['ppt']  = 'libreoffice',
-        ['pptx'] = 'libreoffice',
+        ['doc']  = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['docx'] = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['odt']  = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['xls']  = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['xlsx'] = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['ppt']  = os.getenv('OFFICE_SUITE') or 'libreoffice',
+        ['pptx'] = os.getenv('OFFICE_SUITE') or 'libreoffice',
         -- Video formats
-        ['mp4']  = 'vlc',
-        ['mkv']  = 'vlc',
-        ['avi']  = 'vlc',
-        ['mov']  = 'vlc',
-        ['webm'] = 'vlc',
-        ['flv']  = 'vlc',
-        ['m4v']  = 'vlc',
-        ['mpg']  = 'vlc',
-        ['mpeg'] = 'vlc',
-        ['wmv']  = 'vlc'
+        ['mp4']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['mkv']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['avi']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['mov']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['webm'] = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['flv']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['m4v']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['mpg']  = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['mpeg'] = os.getenv('VIDEO_PLAYER') or 'vlc',
+        ['wmv']  = os.getenv('VIDEO_PLAYER') or 'vlc'
     },
     key = '<F5>',
 }
@@ -82,6 +84,7 @@ local function transform_path(path)
         current_path = current_path .. '/' .. comp
         vim.notify("Current path: " .. current_path, vim.log.levels.INFO)
     end
+
     local filename = components[#components]
     local dir_path = current_path
     local files = vim.fn.glob(dir_path .. '/*', 0, 1)
@@ -105,6 +108,22 @@ local function open_file_or_directory()
         vim.notify("No file path under cursor", vim.log.levels.INFO)
         return
     end
+
+    -- Check if the path is a URL (starts with http:// or https://)
+    if path:match('^https?://') then
+        -- Resolve BROWSER environment variable
+        local browser = os.getenv('BROWSER') or 'xdg-open'
+
+        -- Log the resolved browser and URL
+        vim.notify("Resolved browser: " .. browser, vim.log.levels.INFO)
+        vim.notify("Opening URL with: " .. browser, vim.log.levels.INFO)
+
+        -- Open the URL with the resolved browser
+        vim.fn.jobstart({ browser, path })
+        return
+    end
+
+    -- Transform and resolve the path
     local transformed = transform_path(path)
     if not transformed then
         vim.notify("Failed to transform path: " .. path, vim.log.levels.ERROR)
@@ -113,24 +132,47 @@ local function open_file_or_directory()
 
     -- Check if the path is a directory
     if vim.fn.isdirectory(transformed) == 1 then
-        -- Open directory in WezTerm
-        vim.notify("Opening directory in WezTerm: " .. transformed, vim.log.levels.INFO)
-        vim.fn.jobstart({ 'wezterm', 'cli', 'spawn', '--cwd', transformed }, { detach = true })
+        -- Resolve TERMINAL environment variable
+        local terminal = os.getenv('TERMINAL') or 'wezterm'
+        local terminal_command = { terminal, 'cli', 'spawn', '--cwd', transformed }
+
+        -- Log the resolved terminal command
+        vim.notify("Resolved terminal: " .. terminal, vim.log.levels.INFO)
+        vim.notify("Opening directory in terminal: " .. transformed, vim.log.levels.INFO)
+
+        -- Open directory in the terminal
+        vim.fn.jobstart(terminal_command, { detach = true })
     else
         -- Extract file extension (lowercase)
         local ext = transformed:match('%.([^%.]+)$') or ''
         ext = ext:lower()
 
         -- Determine the application to use
-        local app = config.mappings[ext] or 'xdg-open' -- Fallback to system default
+        -- xdg-open: fallback to system default
+        local app = config.mappings[ext] or 'xdg-open'
         if not app then
             vim.notify("No application mapped for extension: " .. ext, vim.log.levels.WARN)
             return
         end
 
-        -- Open the file
+        -- Resolve $EDITOR dynamically if needed
+        if ext == 'txt' and app == os.getenv('EDITOR') then
+            app = os.getenv('EDITOR') or 'xdg-open'
+        end
+
+        -- Log the resolved application and file path
+        vim.notify("Resolved application: " .. app, vim.log.levels.INFO)
+        vim.notify("File to open: " .. transformed, vim.log.levels.INFO)
+
+        -- Handle .txt files in the current Neovim session
+        if ext == 'txt' then
+            vim.cmd('edit ' .. vim.fn.fnameescape(transformed))
+            return
+        end
+
+        -- Open the file with the resolved application
         vim.notify("Opening file with: " .. app, vim.log.levels.INFO)
-        vim.fn.jobstart({ app, transformed }, { detach = true })
+        vim.fn.jobstart({ app, transformed })
     end
 end
 
@@ -146,3 +188,4 @@ M.open_file_or_directory = open_file_or_directory -- Expose for manual use
 vim.keymap.set({'n', 'v'}, config.key, open_file_or_directory)
 
 return M
+
