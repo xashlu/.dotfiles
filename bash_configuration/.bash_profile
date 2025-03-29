@@ -150,6 +150,10 @@ declare -A DEFAULT_APPS=(
     ["VISUAL"]="nvim"
     ["TERMINAL"]="wezterm"
     ["BROWSER"]="brave"
+    ["IMAGE_VIEWER"]="nsxiv"
+    ["DOCUMENT_VIEWER"]="zathura"
+    ["VIDEO_PLAYER"]="vlc"
+    ["OFFICE_SUITE"]="libreoffice"
 )
 
 # Export default applications
@@ -179,4 +183,3 @@ if [[ -f "$BASHRC_FILE" ]]; then
 else
     printf "Warning: .bashrc file not found: %s\n" "$BASHRC_FILE"
 fi
-
