@@ -175,6 +175,12 @@ source_all_directories
 
 export D=$(echo "$HOME/Desktop")
 
+# Set Neovim as the pager for man pages
+export MANPAGER='nvim +Man!'
+
+# MANWIDTH to enforce an 80-character width
+export MANWIDTH=80
+
 # Source the .bashrc file if it exists
 BASHRC_FILE="$XDG_CONFIG_HOME/bash/.bashrc"
 if [[ -f "$BASHRC_FILE" ]]; then
