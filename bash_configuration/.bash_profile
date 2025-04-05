@@ -181,6 +181,9 @@ export MANPAGER='nvim +Man!'
 # MANWIDTH to enforce an 80-character width
 export MANWIDTH=80
 
+# To determine the client to run, startx first checks $XINITRC
+export XINITRC="$XDG_CONFIG_HOME/X11/xinitrc"
+
 # Source the .bashrc file if it exists
 BASHRC_FILE="$XDG_CONFIG_HOME/bash/.bashrc"
 if [[ -f "$BASHRC_FILE" ]]; then

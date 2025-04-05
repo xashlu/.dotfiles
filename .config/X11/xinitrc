@@ -1,9 +1,6 @@
 [[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
-
 redshift -PO 1000
-
-(unclutter --t 0.5 &> /dev/null &)
-
+(unclutter --t 0.5 & > /dev/null &)
 sxhkd &
-
+xrdb ~/.Xresources
 exec dwm
