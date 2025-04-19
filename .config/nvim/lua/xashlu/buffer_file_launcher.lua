@@ -37,6 +37,7 @@ local config = {
 
 -- Function to transform and resolve the path
 local function transform_path(path)
+
     vim.notify("Input path: " .. path, vim.log.levels.INFO)
     local components = vim.split(path, '/', { plain = true })
     local current_path
@@ -103,11 +104,25 @@ end
 
 -- Function to open the file or directory
 local function open_file_or_directory()
+
     local path = vim.fn.expand('<cfile>')
     if path == '' then
         vim.notify("No file path under cursor", vim.log.levels.INFO)
         return
     end
+
+    -- Get the current buffer's path
+    local buffer_path = vim.fn.expand('%:p')
+    if buffer_path == '' then
+        vim.notify("Current buffer has no file path", vim.log.levels.WARN)
+        return
+    end
+
+    -- Compute parent of the parent directory of the buffer's path
+    local parent_parent = vim.fn.fnamemodify(buffer_path, ':h:h')
+
+    -- Replace $j in the path with the computed directory
+    path = path:gsub('%$j', parent_parent)
 
     -- Check if the path is a URL (starts with http:// or https://)
     if path:match('^https?://') then
