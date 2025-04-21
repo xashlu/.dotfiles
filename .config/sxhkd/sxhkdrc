@@ -1,3 +1,10 @@
+Scroll_Lock
+    dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Seek int64:+5000000
+
+# PgUp key
+Prior
+    dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Seek int64:-5000000
+
 Next
     dbus-send --dest=org.mpris.MediaPlayer2.vlc --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
 #xdotool search --class "vlc" key space
@@ -17,9 +24,10 @@ Delete
 #xdotool search --class "vlc" key p
 
 alt + o
-    /usr/bin/wezterm
-    
+    /usr/bin/wezterm start --cwd "$HOME/Desktop" -- nvim .
     
 alt + l
     /usr/bin/brave 
 
+alt + u
+    /usr/bin/wezterm
