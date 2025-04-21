@@ -96,11 +96,14 @@ done
 shift $((OPTIND-1))
 
 
-if [ $
-    input_file="$1"
-    shift
+# Check if the first argument matches the input file
+if [ "$input_file" = "$1" ]; then
+    echo "Input matches the first argument. Shifting arguments..."
+    shift  # Remove the first argument
 fi
 
+# Print remaining arguments
+echo "Remaining arguments: $@"
 
 if [ -z "$input_file" ]; then
     input_file="${output_directory}/file_list.txt"
