@@ -9,7 +9,7 @@ if [ -z "$BROWSER" ]; then
 fi
 
 # Set websites directory from argument or default value
-websites_dir="${1:-$HOME/Desktop/.brave-websites}"
+websites_dir="${1:-$HOME/Desktop/32}"
 
 # Check if the directory exists
 [ -d "$websites_dir" ] || { echo "Directory not found: $websites_dir"; exit 1; }
