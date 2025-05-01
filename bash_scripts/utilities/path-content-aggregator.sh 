@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Define the input file
+input_file="$HOME/input.txt"
+
+# Check if the input file exists
+if [[ ! -f "$input_file" ]]; then
+    echo "Error: File $input_file does not exist."
+    exit 1
+fi
+
+# Create a temporary file to store the updated content
+temp_file=$(mktemp)
+
+# Parse the input file to generate the list of full paths
+paths=()
+current_dir=""
+current_files=()
+
+while IFS= read -r line; do
+    if [[ $line =~ ^(.*)\{(.*) ]]; then
+        # Start of a directory block
+        current_dir="${BASH_REMATCH[1]}"
+        current_files=()
+        # Extract filenames from the part after {
+        filenames_part="${BASH_REMATCH[2]}"
+        # Split into array based on spaces (assuming no spaces in filenames)
+        IFS=' ' read -ra filenames <<< "$filenames_part"
+        for file in "${filenames[@]}"; do
+            if [[ -n "$file" ]]; then
+                current_files+=("$file")
+            fi
+        done
+    elif [[ $line == '}' ]]; then
+        # End of current block
+        if [[ -n "$current_dir" ]]; then
+            for file in "${current_files[@]}"; do
+                full_path="$current_dir/$file"
+                paths+=("$full_path")
+            done
+            current_dir=""
+            current_files=()
+        else
+            echo "Warning: Closing } without matching block." >&2
+        fi
+    elif [[ -n "$current_dir" ]]; then
+        # Inside a block, add the line as a filename
+        current_files+=("$line")
+    else
+        # Line outside a block; issue a warning
+        echo "Warning: Line outside a block: $line" >&2
+    fi
+done < "$input_file"
+
+# Now process each path in the paths array
+for file_path in "${paths[@]}"; do
+    # Append the file path to the temporary file
+    echo "$file_path" >> "$temp_file"
+    echo "" >> "$temp_file"  # Add a blank line after the path
+
+    # Check if the file exists
+    if [[ -f "$file_path" ]]; then
+        # Append the contents of the file to the temporary file
+        cat "$file_path" >> "$temp_file"
+    else
+        # If the file doesn't exist, add a message
+        echo "File not found: $file_path" >> "$temp_file"
+    fi
+
+    # Add a blank line after the file content
+    echo "" >> "$temp_file"
+done
+
+# Replace the original file with the updated content
+mv "$temp_file" "$input_file"
+
+echo "Operation completed. Updated content written to $input_file."
