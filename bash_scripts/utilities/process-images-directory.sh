@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the base directory (hardcoded path)
-BASE_DIR="$HOME/Desktop/OTHER/photos"
+BASE_DIR="$HOME/Desktop/50/7"
 
 # Function to move all files to a random directory
 move_files_to_random() {
@@ -20,18 +20,20 @@ move_files_to_random() {
     done
 }
 
-# Function to move files from the random directory to the target directories (jpg/png)
+# Function to move files from the random directory to the target directories (jpg/png/webp)
 move_files_from_random_to_target() {
     local destination_random_dir=$1
     local target_jpg_dir=$2
     local target_png_dir=$3
-    local subdir_name=$4
+    local target_webp_dir=$4
+    local subdir_name=$5
 
     echo "Processing random files from: $destination_random_dir"
 
-    # Initialize counters for jpg and png
+    # Initialize counters for jpg, png, webp
     local jpg_counter=0
     local png_counter=0
+    local webp_counter=0
 
     # Loop through the files in the random directory
     for file in "$destination_random_dir"/*; do
@@ -52,6 +54,7 @@ move_files_from_random_to_target() {
                 mv "$file" "$target_file"
                 echo "Moved $(basename "$file") to $target_file"
                 ((jpg_counter++))
+
             elif [[ "$ext" == "png" ]]; then
                 local new_file_name="${subdir_name:0:1}-${png_counter}.png"
                 local target_file="$target_png_dir/$new_file_name"
@@ -65,6 +68,21 @@ move_files_from_random_to_target() {
                 mv "$file" "$target_file"
                 echo "Moved $(basename "$file") to $target_file"
                 ((png_counter++))
+
+            elif [[ "$ext" == "webp" ]]; then
+                local new_file_name="${subdir_name:0:1}-${webp_counter}.webp"
+                local target_file="$target_webp_dir/$new_file_name"
+
+                while [[ -f "$target_file" ]]; do
+                    ((webp_counter++))
+                    new_file_name="${subdir_name:0:1}-${webp_counter}.webp"
+                    target_file="$target_webp_dir/$new_file_name"
+                done
+
+                mv "$file" "$target_file"
+                echo "Moved $(basename "$file") to $target_file"
+                ((webp_counter++))
+
             else
                 echo "Skipping unsupported file format: $(basename "$file")"
             fi
@@ -96,10 +114,11 @@ process_directory_in_place() {
 
             echo "Processing subdirectory: $subdir_name"
 
-            # Create jpg and png subdirectories if they don't exist
+            # Create jpg, png, and webp subdirectories
             local jpg_dir="$subdir_path/jpg"
             local png_dir="$subdir_path/png"
-            mkdir -p "$jpg_dir" "$png_dir"
+            local webp_dir="$subdir_path/webp"
+            mkdir -p "$jpg_dir" "$png_dir" "$webp_dir"
 
             # Ensure a random directory exists and move all files there
             move_files_to_random "$subdir_path"
@@ -107,8 +126,9 @@ process_directory_in_place() {
             # Process the random directory
             local random_dir="$subdir_path/random"
             if [[ -d "$random_dir" ]]; then
-                move_files_from_random_to_target "$random_dir" "$jpg_dir" "$png_dir" "$subdir_name"
+                move_files_from_random_to_target "$random_dir" "$jpg_dir" "$png_dir" "$webp_dir" "$subdir_name"
 
+                # Clear the random directory after processing
                 rm -rf "$random_dir"/*
                 echo "Cleared random directory: $random_dir"
             fi
