@@ -155,3 +155,24 @@ function ManualSyncNetrwWithPwd()
   end
 end
 vim.keymap.set('n', '<leader>cd', ManualSyncNetrwWithPwd)
+
+vim.keymap.set("n", "<F3>", function()
+    -- Get current file directory
+    local current_dir = vim.fn.expand('%:p:h')
+    if current_dir == "" or current_dir == "." then
+        current_dir = vim.fn.getcwd()
+    end
+
+    -- Escape quotes
+    current_dir = string.gsub(current_dir, "'", "'\"'\"'")
+
+    -- Use $HOME for portability
+    local home_dir = os.getenv("HOME")
+    local script_path = home_dir .. "/.bash-scripts/utilities/launch-python-workspace.sh"
+
+    -- Build command
+    local cmd = string.format("%s '%s'", script_path, current_dir)
+
+    -- Run safely in background
+    os.execute(string.format("nohup sh -c \"%s\" > /dev/null 2>&1 &", cmd))
+end, { noremap = true, silent = true })
