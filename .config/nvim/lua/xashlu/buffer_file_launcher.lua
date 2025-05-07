@@ -149,14 +149,17 @@ local function open_file_or_directory()
     if vim.fn.isdirectory(transformed) == 1 then
         -- Resolve TERMINAL environment variable
         local terminal = os.getenv('TERMINAL') or 'wezterm'
-        local terminal_command = { terminal, 'cli', 'spawn', '--cwd', transformed }
+
+        -- Build terminal command to open a new standalone window
+        local terminal_command = { terminal, 'start', '--cwd', transformed }
 
         -- Log the resolved terminal command
         vim.notify("Resolved terminal: " .. terminal, vim.log.levels.INFO)
-        vim.notify("Opening directory in terminal: " .. transformed, vim.log.levels.INFO)
+        vim.notify("Opening directory in new WezTerm window: " .. transformed, vim.log.levels.INFO)
 
-        -- Open directory in the terminal
+        -- Open directory in a new standalone WezTerm window
         vim.fn.jobstart(terminal_command, { detach = true })
+
     else
         -- Extract file extension (lowercase)
         local ext = transformed:match('%.([^%.]+)$') or ''
