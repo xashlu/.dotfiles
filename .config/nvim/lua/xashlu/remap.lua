@@ -176,3 +176,66 @@ vim.keymap.set("n", "<F3>", function()
     -- Run safely in background
     os.execute(string.format("nohup sh -c \"%s\" > /dev/null 2>&1 &", cmd))
 end, { noremap = true, silent = true })
+
+function CopyNetrwPath()
+  if vim.bo.filetype ~= 'netrw' then
+    vim.notify('Not a Netrw buffer', vim.log.levels.WARN)
+    return
+  end
+
+  local netrw_dir = vim.b.netrw_curdir
+    or (vim.fn.isdirectory(vim.fn.expand('%:p')) == 1 and vim.fn.expand('%:p'))
+    or vim.fn.getcwd()
+
+  if vim.fn.isdirectory(netrw_dir) ~= 1 then
+    vim.notify('Invalid directory: ' .. (netrw_dir or 'N/A'), vim.log.levels.ERROR)
+    return
+  end
+
+  -- Use Vim's built-in register to set the system clipboard (register "+")
+  vim.fn.setreg('+', netrw_dir)
+  vim.notify('Copied to clipboard: ' .. netrw_dir, vim.log.levels.INFO)
+end
+
+-- Keymap to copy Netrw path using the updated function
+vim.keymap.set('n', '<F10>', CopyNetrwPath, { desc = 'Copy Netrw path to system clipboard' })
+
+function CopyNetrwSelectedFilePath()
+  -- Ensure the current buffer is a Netrw buffer
+  if vim.bo.filetype ~= 'netrw' then
+    vim.notify('Not a Netrw buffer', vim.log.levels.WARN)
+    return
+  end
+
+  -- Get the current Netrw directory, similar to CopyNetrwPath
+  local netrw_dir = vim.b.netrw_curdir
+    or (vim.fn.isdirectory(vim.fn.expand('%:p')) == 1 and vim.fn.expand('%:p'))
+    or vim.fn.getcwd()
+
+  -- Validate the Netrw directory
+  if vim.fn.isdirectory(netrw_dir) ~= 1 then
+    vim.notify('Invalid Netrw directory: ' .. (netrw_dir or 'N/A'), vim.log.levels.ERROR)
+    return
+  end
+
+  -- Get the file or directory name directly under the cursor in the Netrw buffer.
+  -- <cfile> expands the word under the cursor as a file name.
+  local selected_item = vim.fn.expand('<cfile>')
+
+  -- Check for invalid selections: empty string, '.', or '..'
+  if not selected_item or selected_item == '' or selected_item == '.' or selected_item == '..' then
+    vim.notify('No valid file or directory selected in Netrw', vim.log.levels.WARN)
+    return
+  end
+
+  -- Construct the full absolute path by joining the Netrw directory and the selected item.
+  -- vim.fn.fnamemodify(path, ':p') ensures the path is absolute and normalized (e.g., resolves '..').
+  local absolute_path = vim.fn.fnamemodify(netrw_dir .. '/' .. selected_item, ':p')
+
+  -- Copy the absolute path to the system clipboard
+  vim.fn.setreg('+', absolute_path)
+  vim.notify('Copied to clipboard: ' .. absolute_path, vim.log.levels.INFO)
+end
+
+-- Keymap for F11: Copy the absolute path of the selected item in Netrw
+vim.keymap.set('n', '<F11>', CopyNetrwSelectedFilePath, { desc = 'Copy absolute path of selected Netrw item to system clipboard' })
