@@ -1,6 +1,15 @@
-[[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
-redshift -PO 1000
-(unclutter --t 0.5 & > /dev/null &)
-sxhkd &
+# Load X resources
 xrdb ~/.Xresources
+
+# Input settings
+[[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
+xmodmap -e "keycode 77 = Num_Lock"
+
+# Start background services
+redshift -PO 1000 &
+unclutter --timeout 0.5 > /dev/null &
+sxhkd &
+~/.bash-scripts/utilities/watch-desktop.sh &
+
+# start dwm
 exec dwm
