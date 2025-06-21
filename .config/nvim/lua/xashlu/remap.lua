@@ -197,9 +197,6 @@ function CopyNetrwPath()
   vim.notify('Copied to clipboard: ' .. netrw_dir, vim.log.levels.INFO)
 end
 
--- Keymap to copy Netrw path using the updated function
-vim.keymap.set('n', '<F10>', CopyNetrwPath, { desc = 'Copy Netrw path to system clipboard' })
-
 function CopyNetrwSelectedFilePath()
   -- Ensure the current buffer is a Netrw buffer
   if vim.bo.filetype ~= 'netrw' then
