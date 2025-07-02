@@ -18,6 +18,7 @@ bind 'set completion-ignore-case on'
 
 bind -x '"\C-p": source fuzzy-dir-navigator'
 bind '"\C-n": "source tmux-kill-session\C-m"'
+bind '"\C-j": "source reattach-tmux-session\C-m"'
 bind -x '"\C-x": edit_current_command'
 bind -x '"\C-l": clear_and_delete_history'
 bind '"\C-o": "nvim .\C-m"'
