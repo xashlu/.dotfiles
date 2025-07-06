@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Key combo passed as first argument: key_combo="$1"
+
+# Read input files from stdin
+while IFS= read -r -d $'\0' file; do
+    echo "$file" | xclip -selection clipboard
+done < <(grep -a -o '/.*' | tr '\n' '\0')
