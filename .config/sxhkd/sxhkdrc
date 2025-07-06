@@ -31,3 +31,7 @@ alt + l
 
 alt + u
     /usr/bin/wezterm
+
+# Copy current VLC video file path to clipboard
+alt + v
+    ~/.bash-scripts/utilities/vlc-copy-path.sh
